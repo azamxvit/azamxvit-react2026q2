@@ -1,122 +1,99 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Component } from 'react';
+import { ErrorBoundary } from './components/error-boundary/ErrorBoundary';
+import { Search } from './components/search/Search';
+import { CardList } from './components/article-list/CardList';
+import { Loader } from './components/skeleton/Loader';
+import { fetchCharacters } from './api/swapi';
+import type { Character } from './types/character';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank" rel="noreferrer">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank" rel="noreferrer">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank" rel="noreferrer">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank" rel="noreferrer">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank" rel="noreferrer">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noreferrer">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+interface AppState {
+  searchTerm: string;
+  results: Character[];
+  isLoading: boolean;
+  error: string | null;
+  triggerError: boolean;
 }
 
-export default App
+class AppContent extends Component<Record<string, never>, AppState> {
+  constructor(props: Record<string, never>) {
+    super(props);
+    const savedSearch = localStorage.getItem('rss_search_term') || '';
+    this.state = {
+      searchTerm: savedSearch,
+      results: [],
+      isLoading: false,
+      error: null,
+      triggerError: false,
+    };
+  }
+
+  componentDidMount() {
+    this.loadData(this.state.searchTerm);
+  }
+
+  loadData = async (query: string) => {
+    this.setState({ isLoading: true, error: null });
+    try {
+      const data = await fetchCharacters(query);
+      this.setState({ results: data.results, isLoading: false });
+    } catch (error) {
+      this.setState({
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        isLoading: false,
+      });
+    }
+  };
+
+  handleSearch = (newSearchTerm: string) => {
+    if (newSearchTerm === this.state.searchTerm) {
+      return;
+    }
+    localStorage.setItem('rss_search_term', newSearchTerm);
+    this.setState({ searchTerm: newSearchTerm }, () => {
+      this.loadData(newSearchTerm);
+    });
+  };
+
+  handleThrowError = () => {
+    this.setState({ triggerError: true });
+  };
+
+  render() {
+    if (this.state.triggerError) {
+      throw new Error('This is a simulated application error!');
+    }
+
+    return (
+      <div className="app-container">
+        <header className="top-controls">
+          <Search initialValue={this.state.searchTerm} onSearch={this.handleSearch} />
+        </header>
+
+        <main className="results-section">
+          {this.state.error ? (
+            <div className="api-error">{this.state.error}</div>
+          ) : this.state.isLoading ? (
+            <Loader />
+          ) : (
+            <CardList items={this.state.results} />
+          )}
+        </main>
+
+        <button className="error-btn" onClick={this.handleThrowError}>
+          Throw Error
+        </button>
+      </div>
+    );
+  }
+}
+
+export default class App extends Component {
+  render() {
+    return (
+      <ErrorBoundary>
+        <AppContent />
+      </ErrorBoundary>
+    );
+  }
+}
