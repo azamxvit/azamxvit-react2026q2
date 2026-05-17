@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { CardList } from './CardList';
 import type { Character } from '../../types/character';
+import { renderWithRouter } from '../../test-utils/renderWithRouter';
 
 const buildCharacter = (overrides: Partial<Character> = {}): Character => ({
   name: 'Luke Skywalker',
@@ -18,14 +19,14 @@ describe('CardList', () => {
       buildCharacter({ url: 'https://swapi.py4e.com/api/people/2/', name: 'C-3PO' }),
     ];
 
-    render(<CardList items={items} />);
+    renderWithRouter(<CardList items={items} />);
 
     expect(screen.getByText('Luke')).toBeInTheDocument();
     expect(screen.getByText('C-3PO')).toBeInTheDocument();
   });
 
   it('shows a no-results message when the list is empty', () => {
-    render(<CardList items={[]} />);
+    renderWithRouter(<CardList items={[]} />);
 
     expect(screen.getByText('No results found.')).toBeInTheDocument();
   });

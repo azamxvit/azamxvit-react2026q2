@@ -1,7 +1,11 @@
-import { Component } from 'react';
+interface Props {
+  label?: string;
+}
 
-export class Loader extends Component {
-  render() {
-    return <div className="loader">Loading data... Please wait.</div>;
-  }
+export function Loader({ label = 'Loading data... Please wait.' }: Props) {
+  return (
+    <div className="loader" role="status" aria-label={label}>
+      {label}
+    </div>
+  );
 }

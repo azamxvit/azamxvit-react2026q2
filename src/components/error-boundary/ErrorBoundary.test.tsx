@@ -51,7 +51,9 @@ describe('ErrorBoundary', () => {
 
     await user.click(screen.getByRole('button', { name: /break things/i }));
 
-    expect(await screen.findByRole('heading', { name: /something went wrong/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /something went wrong/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Triggered failure')).toBeInTheDocument();
   });
 

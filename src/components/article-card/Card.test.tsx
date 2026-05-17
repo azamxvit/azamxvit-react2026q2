@@ -1,7 +1,8 @@
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { Card } from './Card';
 import type { Character } from '../../types/character';
+import { renderWithRouter } from '../../test-utils/renderWithRouter';
 
 const baseItem: Character = {
   name: 'Luke Skywalker',
@@ -12,22 +13,26 @@ const baseItem: Character = {
 
 describe('Card', () => {
   it('displays name, birth year, and gender', () => {
-    render(<Card item={baseItem} />);
+    renderWithRouter(<Card item={baseItem} />);
 
     expect(screen.getByRole('heading', { name: 'Luke Skywalker' })).toBeInTheDocument();
     expect(screen.getByText('19BBY')).toBeInTheDocument();
     expect(screen.getByText('male')).toBeInTheDocument();
   });
 
-  it('still renders labels when optional-looking fields are empty strings', () => {
-    const item: Character = {
-      ...baseItem,
-      name: 'Unknown',
-      birth_year: '',
-      gender: '',
-    };
+  it('renders as a link pointing to the character details route', () => {
+    renderWithRouter(<Card item={baseItem} />, { route: '/?page=2' });
 
-    const { container } = render(<Card item={item} />);
+    const link = screen.getByTestId('character-card');
+    expect(link).toHaveAttribute('href', expect.stringMatching(/^\/details\/1\?/));
+    expect(link.getAttribute('href')).toContain('page=2');
+    expect(link.getAttribute('href')).toContain('details=1');
+  });
+
+  it('still renders labels when optional-looking fields are empty strings', () => {
+    const item: Character = { ...baseItem, name: 'Unknown', birth_year: '', gender: '' };
+
+    const { container } = renderWithRouter(<Card item={item} />);
 
     expect(screen.getByRole('heading', { name: 'Unknown' })).toBeInTheDocument();
     expect(within(container).getByText(/Birth Year/i)).toBeInTheDocument();
