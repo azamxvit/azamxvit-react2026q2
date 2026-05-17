@@ -5,6 +5,14 @@ export interface Character {
   url: string;
 }
 
+export interface CharacterDetails extends Character {
+  height: string;
+  mass: string;
+  hair_color: string;
+  skin_color: string;
+  eye_color: string;
+}
+
 export interface ApiResponse {
   count: number;
   next: string | null;
