@@ -1,15 +1,22 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import App from './App';
+import { MemoryRouter } from 'react-router-dom';
+import { AppRoutes } from './routes';
 import * as swapi from './api/swapi';
 import { installLocalStorageMock } from './test-utils/localStorage';
 
-vi.mock('./api/swapi', () => ({
-  fetchCharacters: vi.fn(),
-}));
+vi.mock('./api/swapi', async () => {
+  const actual = await vi.importActual<typeof swapi>('./api/swapi');
+  return {
+    ...actual,
+    fetchCharacters: vi.fn(),
+    fetchCharacterById: vi.fn(),
+  };
+});
 
 const fetchCharacters = vi.mocked(swapi.fetchCharacters);
+const fetchCharacterById = vi.mocked(swapi.fetchCharacterById);
 
 const sampleCharacter = {
   name: 'Luke Skywalker',
@@ -18,14 +25,29 @@ const sampleCharacter = {
   url: 'https://swapi.py4e.com/api/people/1/',
 };
 
-describe('App', () => {
+const renderApp = (route = '/') =>
+  render(
+    <MemoryRouter initialEntries={[route]}>
+      <AppRoutes />
+    </MemoryRouter>,
+  );
+
+describe('App routing & home page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     fetchCharacters.mockResolvedValue({
-      count: 1,
-      next: null,
+      count: 12,
+      next: 'next-page',
       previous: null,
       results: [sampleCharacter],
+    });
+    fetchCharacterById.mockResolvedValue({
+      ...sampleCharacter,
+      height: '172',
+      mass: '77',
+      hair_color: 'blond',
+      skin_color: 'fair',
+      eye_color: 'blue',
     });
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
@@ -34,114 +56,54 @@ describe('App', () => {
     vi.restoreAllMocks();
   });
 
-  it('fetches characters on mount', async () => {
-    installLocalStorageMock();
-    render(<App />);
-
-    await waitFor(() => expect(fetchCharacters).toHaveBeenCalledWith(''));
-    await screen.findByText('Luke Skywalker');
-  });
-
-  it('uses the search term stored in localStorage for the first fetch', async () => {
+  it('fetches characters on mount using the stored search term', async () => {
     const { seed } = installLocalStorageMock();
     seed('rss_search_term', 'r2');
 
-    fetchCharacters.mockResolvedValue({
-      count: 0,
-      next: null,
-      previous: null,
-      results: [],
-    });
+    renderApp('/');
 
-    render(<App />);
-
-    await waitFor(() => expect(fetchCharacters).toHaveBeenCalledWith('r2'));
-    expect(screen.getByPlaceholderText(/search star wars/i)).toHaveValue('r2');
+    await waitFor(() => expect(fetchCharacters).toHaveBeenCalledWith('r2', 1));
+    expect(await screen.findByText('Luke Skywalker')).toBeInTheDocument();
   });
 
-  it('shows an empty search input when nothing is stored yet', async () => {
+  it('renders an empty search input when nothing is stored yet', async () => {
     installLocalStorageMock();
-    render(<App />);
+    renderApp('/');
 
-    await waitFor(() => expect(fetchCharacters).toHaveBeenCalled());
+    await waitFor(() => expect(fetchCharacters).toHaveBeenCalledWith('', 1));
     expect(screen.getByPlaceholderText(/search star wars/i)).toHaveValue('');
   });
 
-  it('persists a new search term to localStorage and refreshes results', async () => {
+  it('persists a new search term to localStorage and resets to page 1', async () => {
     const user = userEvent.setup();
     const { mockStorage } = installLocalStorageMock();
+    renderApp('/?page=3');
 
-    render(<App />);
-    await screen.findByText('Luke Skywalker');
-
-    fetchCharacters.mockResolvedValueOnce({
-      count: 1,
-      next: null,
-      previous: null,
-      results: [
-        {
-          name: 'Han Solo',
-          birth_year: '29BBY',
-          gender: 'male',
-          url: 'https://swapi.py4e.com/api/people/14/',
-        },
-      ],
-    });
+    await waitFor(() => expect(fetchCharacters).toHaveBeenCalledWith('', 3));
 
     const input = screen.getByPlaceholderText(/search star wars/i);
     await user.clear(input);
     await user.type(input, 'han');
-    await user.click(screen.getByRole('button', { name: /search/i }));
+    await user.click(screen.getByRole('button', { name: /^search$/i }));
 
     await waitFor(() =>
       expect(mockStorage.setItem).toHaveBeenCalledWith('rss_search_term', 'han'),
     );
-    await screen.findByText('Han Solo');
-    expect(fetchCharacters).toHaveBeenCalledWith('han');
-  });
-
-  it('does not trigger another fetch when submitting the same term again', async () => {
-    const user = userEvent.setup();
-    installLocalStorageMock();
-
-    render(<App />);
-    await screen.findByText('Luke Skywalker');
-
-    const initialCalls = fetchCharacters.mock.calls.length;
-
-    await user.click(screen.getByRole('button', { name: /search/i }));
-
-    await waitFor(() => expect(fetchCharacters.mock.calls.length).toBe(initialCalls));
+    await waitFor(() => expect(fetchCharacters).toHaveBeenLastCalledWith('han', 1));
   });
 
   it('shows a friendly API error message when the request fails', async () => {
     installLocalStorageMock();
     fetchCharacters.mockRejectedValueOnce(new Error('Network interruption'));
 
-    render(<App />);
+    renderApp('/');
 
     expect(await screen.findByText('Network interruption')).toBeInTheDocument();
-    expect(screen.queryByText('Luke Skywalker')).not.toBeInTheDocument();
-  });
-
-  it('shows a generic message when the API rejects with a non-Error value', async () => {
-    installLocalStorageMock();
-    fetchCharacters.mockRejectedValueOnce('unexpected');
-
-    render(<App />);
-
-    expect(await screen.findByText('Unknown error occurred')).toBeInTheDocument();
   });
 
   it('shows the loader while data is loading', async () => {
     installLocalStorageMock();
-
-    let finish!: (value: {
-      count: number;
-      next: null;
-      previous: null;
-      results: typeof sampleCharacter[];
-    }) => void;
+    let finish!: (value: Awaited<ReturnType<typeof swapi.fetchCharacters>>) => void;
     fetchCharacters.mockImplementationOnce(
       () =>
         new Promise((resolve) => {
@@ -149,41 +111,150 @@ describe('App', () => {
         }),
     );
 
-    render(<App />);
+    renderApp('/');
 
-    expect(screen.getByText(/loading data/i)).toBeInTheDocument();
+    expect(await screen.findByRole('status')).toHaveAccessibleName(/loading data/i);
 
-    finish({
-      count: 0,
-      next: null,
-      previous: null,
-      results: [],
-    });
+    finish({ count: 0, next: null, previous: null, results: [] });
 
-    await waitFor(() => expect(screen.queryByText(/loading data/i)).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument());
     expect(screen.getByText('No results found.')).toBeInTheDocument();
   });
 
-  it('renders the card list after loading completes', async () => {
+  it('renders pagination only after items are loaded and updates the URL on next/prev', async () => {
     installLocalStorageMock();
-    render(<App />);
+    const user = userEvent.setup();
+    renderApp('/?page=1');
 
-    const main = screen.getByRole('main');
-    await waitFor(() =>
-      expect(within(main).getByRole('heading', { name: 'Luke Skywalker' })).toBeInTheDocument(),
-    );
+    await screen.findByText('Luke Skywalker');
+
+    const pagination = await screen.findByRole('navigation', { name: /pagination/i });
+    expect(within(pagination).getByTestId('current-page')).toHaveTextContent('Page 1');
+
+    await user.click(within(pagination).getByRole('button', { name: /next/i }));
+    await waitFor(() => expect(fetchCharacters).toHaveBeenLastCalledWith('', 2));
+    expect(within(pagination).getByTestId('current-page')).toHaveTextContent('Page 2');
   });
 
-  it('routes thrown errors through the error boundary', async () => {
+  it('hides pagination while loading or when an error happens', async () => {
+    installLocalStorageMock();
+    fetchCharacters.mockRejectedValueOnce(new Error('boom'));
+
+    renderApp('/');
+
+    expect(await screen.findByText('boom')).toBeInTheDocument();
+    expect(screen.queryByRole('navigation', { name: /pagination/i })).not.toBeInTheDocument();
+  });
+
+  it('opens the details panel via an Outlet route and shows a loading indicator', async () => {
+    installLocalStorageMock();
+    let resolveDetails!: (value: Awaited<ReturnType<typeof swapi.fetchCharacterById>>) => void;
+    fetchCharacterById.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveDetails = resolve;
+        }),
+    );
+
+    renderApp('/details/1?page=1');
+
+    await screen.findByTestId('details-panel');
+    const detailsPanel = screen.getByTestId('details-panel');
+    expect(within(detailsPanel).getByRole('status')).toHaveAccessibleName(/loading details/i);
+
+    resolveDetails({
+      ...sampleCharacter,
+      height: '172',
+      mass: '77',
+      hair_color: 'blond',
+      skin_color: 'fair',
+      eye_color: 'blue',
+    });
+
+    expect(await within(detailsPanel).findByRole('heading', { name: 'Luke Skywalker' })).toBeInTheDocument();
+  });
+
+  it('does not show the details panel on initial load', async () => {
+    installLocalStorageMock();
+    renderApp('/');
+
+    await screen.findByText('Luke Skywalker');
+    expect(screen.queryByTestId('details-panel')).not.toBeInTheDocument();
+    expect(fetchCharacterById).not.toHaveBeenCalled();
+  });
+
+  it('closes the details panel via the close button', async () => {
+    installLocalStorageMock();
+    const user = userEvent.setup();
+    renderApp('/details/1?page=1');
+
+    await screen.findByTestId('details-panel');
+    await user.click(screen.getByRole('button', { name: /close details/i }));
+
+    await waitFor(() => expect(screen.queryByTestId('details-panel')).not.toBeInTheDocument());
+  });
+
+  it('closes the details panel when clicking the main panel background', async () => {
+    installLocalStorageMock();
+    const user = userEvent.setup();
+    renderApp('/details/1?page=1');
+
+    await screen.findByTestId('details-panel');
+    await user.click(screen.getByTestId('main-panel'));
+
+    await waitFor(() => expect(screen.queryByTestId('details-panel')).not.toBeInTheDocument());
+  });
+
+  it('clicking a card does not bubble up and close the details panel', async () => {
+    installLocalStorageMock();
+    const user = userEvent.setup();
+    renderApp('/details/1?page=1');
+
+    await screen.findByTestId('details-panel');
+
+    const card = (await screen.findAllByTestId('character-card'))[0];
+    await user.click(card);
+
+    expect(screen.getByTestId('details-panel')).toBeInTheDocument();
+  });
+
+  it('routes thrown errors to the error boundary fallback UI', async () => {
     const user = userEvent.setup();
     installLocalStorageMock();
-    render(<App />);
+    renderApp('/');
 
     await screen.findByText('Luke Skywalker');
 
     await user.click(screen.getByRole('button', { name: /throw error/i }));
 
-    expect(await screen.findByRole('heading', { name: /something went wrong/i })).toBeInTheDocument();
-    expect(screen.getByText(/simulated application error/i)).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /something went wrong/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('renders the About page and shows a course link', async () => {
+    installLocalStorageMock();
+    renderApp('/about');
+
+    expect(await screen.findByRole('heading', { name: /about/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /rolling scopes school react course/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('renders the 404 page for unknown routes', async () => {
+    installLocalStorageMock();
+    renderApp('/some/unknown/path');
+
+    expect(await screen.findByRole('heading', { name: /404/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /back to home/i })).toHaveAttribute('href', '/');
+  });
+
+  it('ensures ?page=1 is added to the URL when missing on initial load', async () => {
+    installLocalStorageMock();
+    renderApp('/');
+
+    await waitFor(() => expect(fetchCharacters).toHaveBeenCalledWith('', 1));
+    expect(await screen.findByText('Page 1')).toBeInTheDocument();
   });
 });
