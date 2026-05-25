@@ -4,6 +4,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { AppRoutes } from './routes';
 import * as swapi from './api/swapi';
+import { ThemeProvider } from './context/ThemeProvider';
+import { useSelectedItemsStore } from './store/selectedItemsStore';
 import { installLocalStorageMock } from './test-utils/localStorage';
 
 vi.mock('./api/swapi', async () => {
@@ -27,13 +29,16 @@ const sampleCharacter = {
 
 const renderApp = (route = '/') =>
   render(
-    <MemoryRouter initialEntries={[route]}>
-      <AppRoutes />
-    </MemoryRouter>,
+    <ThemeProvider>
+      <MemoryRouter initialEntries={[route]}>
+        <AppRoutes />
+      </MemoryRouter>
+    </ThemeProvider>,
   );
 
 describe('App routing & home page', () => {
   beforeEach(() => {
+    useSelectedItemsStore.setState({ itemsByUrl: {} });
     vi.clearAllMocks();
     fetchCharacters.mockResolvedValue({
       count: 12,
@@ -256,5 +261,47 @@ describe('App routing & home page', () => {
 
     await waitFor(() => expect(fetchCharacters).toHaveBeenCalledWith('', 1));
     expect(await screen.findByText('Page 1')).toBeInTheDocument();
+  });
+
+  it('persists selected items across page navigation', async () => {
+    const user = userEvent.setup();
+    installLocalStorageMock();
+    renderApp('/');
+
+    await screen.findByText('Luke Skywalker');
+    await user.click(screen.getByTestId('character-checkbox'));
+
+    expect(screen.getByTestId('selection-flyout')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('link', { name: /^about$/i }));
+    expect(await screen.findByRole('heading', { name: /about/i })).toBeInTheDocument();
+    expect(screen.getByText('1 item selected')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('link', { name: /^home$/i }));
+    await screen.findByText('Luke Skywalker');
+    expect(screen.getByTestId('character-checkbox')).toBeChecked();
+  });
+
+  it('unselects all items from the flyout', async () => {
+    const user = userEvent.setup();
+    installLocalStorageMock();
+    renderApp('/');
+
+    await screen.findByText('Luke Skywalker');
+    await user.click(screen.getByTestId('character-checkbox'));
+    await user.click(screen.getByRole('button', { name: /unselect all/i }));
+
+    expect(screen.queryByTestId('selection-flyout')).not.toBeInTheDocument();
+  });
+
+  it('switches theme from the header control', async () => {
+    const user = userEvent.setup();
+    installLocalStorageMock();
+    renderApp('/');
+
+    await screen.findByTestId('theme-toggle');
+    await user.click(screen.getByRole('radio', { name: /dark/i }));
+
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
   });
 });
