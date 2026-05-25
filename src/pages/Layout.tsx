@@ -1,5 +1,7 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { ErrorBoundary } from '../components/error-boundary/ErrorBoundary';
+import { SelectionFlyout } from '../components/flyout/SelectionFlyout';
+import { ThemeToggle } from '../components/theme/ThemeToggle';
 
 export function Layout() {
   return (
@@ -8,6 +10,7 @@ export function Layout() {
         <Link to="/" className="app-title">
           Star Wars Explorer
         </Link>
+        <ThemeToggle />
         <nav className="app-nav" aria-label="Main">
           <NavLink to="/" end>
             Home
@@ -21,6 +24,8 @@ export function Layout() {
           <Outlet />
         </ErrorBoundary>
       </main>
+
+      <SelectionFlyout />
     </div>
   );
 }
