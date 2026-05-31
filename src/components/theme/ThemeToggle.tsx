@@ -1,15 +1,16 @@
-import type { Theme } from '../../context/themeContext';
-import { useTheme } from '../../context/useTheme';
+import { THEME } from '@/context/themeContext';
+import { useTheme } from '@/context/useTheme';
+import { UI_LABELS } from '@/constants/labels';
 
-const THEMES: Theme[] = ['light', 'dark'];
+const themeOptions = Object.values(THEME);
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   return (
     <div className="theme-toggle" data-testid="theme-toggle">
-      <span className="theme-toggle__label">Theme:</span>
-      {THEMES.map((option) => (
+      <span className="theme-toggle__label">{UI_LABELS.theme.label}</span>
+      {themeOptions.map((option) => (
         <label key={option} className="theme-toggle__option">
           <input
             type="radio"
