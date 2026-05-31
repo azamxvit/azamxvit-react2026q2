@@ -5,29 +5,10 @@ import { CardList } from '../components/article-list/CardList';
 import { Loader } from '../components/skeleton/Loader';
 import { Pagination } from '../components/pagination/Pagination';
 import { Search } from '../components/search/Search';
-import { fetchCharacters } from '../api/swapi';
+import { useCharactersQuery, useInvalidateCharacters } from '../hooks/useCharactersQuery';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import type { Character } from '../types/character';
 
 const SEARCH_STORAGE_KEY = 'rss_search_term';
-
-interface HomeState {
-  results: Character[];
-  count: number;
-  hasPrevious: boolean;
-  hasNext: boolean;
-  isLoading: boolean;
-  error: string | null;
-}
-
-const initialState: HomeState = {
-  results: [],
-  count: 0,
-  hasPrevious: false,
-  hasNext: false,
-  isLoading: false,
-  error: null,
-};
 
 export function Home() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,11 +17,16 @@ export function Home() {
   const { id: detailsId } = useParams();
 
   const [searchTerm, setSearchTerm] = useLocalStorage(SEARCH_STORAGE_KEY, '');
-  const [state, setState] = useState<HomeState>(initialState);
   const [triggerError, setTriggerError] = useState(false);
 
   const pageParam = Number(searchParams.get('page'));
   const currentPage = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
+
+  const { data, isLoading, isFetching, isError, error } = useCharactersQuery(
+    searchTerm,
+    currentPage,
+  );
+  const invalidateCharacters = useInvalidateCharacters();
 
   useEffect(() => {
     if (!searchParams.get('page')) {
@@ -49,41 +35,6 @@ export function Home() {
       setSearchParams(next, { replace: true });
     }
   }, [searchParams, setSearchParams]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const load = async () => {
-      setState((prev) => ({ ...prev, isLoading: true, error: null }));
-      try {
-        const data = await fetchCharacters(searchTerm, currentPage);
-        if (cancelled) return;
-        setState({
-          results: data.results,
-          count: data.count,
-          hasPrevious: Boolean(data.previous),
-          hasNext: Boolean(data.next),
-          isLoading: false,
-          error: null,
-        });
-      } catch (error) {
-        if (cancelled) return;
-        setState({
-          results: [],
-          count: 0,
-          hasPrevious: false,
-          hasNext: false,
-          isLoading: false,
-          error: error instanceof Error ? error.message : 'Unknown error occurred',
-        });
-      }
-    };
-
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [searchTerm, currentPage]);
 
   const handleSearch = useCallback(
     (newSearchTerm: string) => {
@@ -118,12 +69,50 @@ export function Home() {
     [detailsId, navigate, searchParams],
   );
 
+  const handleRefresh = () => {
+    void invalidateCharacters(searchTerm, currentPage);
+  };
+
   const handleThrowError = () => setTriggerError(true);
   if (triggerError) {
     throw new Error('This is a simulated application error!');
   }
 
-  const showPagination = !state.isLoading && !state.error && state.results.length > 0;
+  const results = data?.results ?? [];
+  const errorMessage = isError
+    ? error instanceof Error
+      ? error.message
+      : 'Unknown error occurred'
+    : null;
+  const showPagination = !isLoading && !errorMessage && results.length > 0;
+  const showLoader = isLoading || (isFetching && !data);
+
+  const renderResultsContent = () => {
+    if (errorMessage) {
+      return <div className="api-error">{errorMessage}</div>;
+    }
+
+    if (showLoader) {
+      return <Loader />;
+    }
+
+    return <CardList items={results} />;
+  };
+
+  const renderPagination = () => {
+    if (!showPagination || !data) {
+      return null;
+    }
+
+    return (
+      <Pagination
+        currentPage={currentPage}
+        hasPrevious={Boolean(data.previous)}
+        hasNext={Boolean(data.next)}
+        onPageChange={handlePageChange}
+      />
+    );
+  };
 
   return (
     <div className={detailsId ? 'home home--split' : 'home'}>
@@ -134,26 +123,20 @@ export function Home() {
       >
         <div className="top-controls">
           <Search initialValue={searchTerm} onSearch={handleSearch} />
+          <button
+            type="button"
+            className="refresh-btn"
+            onClick={handleRefresh}
+            disabled={isFetching}
+            aria-label="Refresh character list"
+          >
+            Refresh
+          </button>
         </div>
 
-        <div className="results-section">
-          {state.error ? (
-            <div className="api-error">{state.error}</div>
-          ) : state.isLoading ? (
-            <Loader />
-          ) : (
-            <CardList items={state.results} />
-          )}
-        </div>
+        <div className="results-section">{renderResultsContent()}</div>
 
-        {showPagination && (
-          <Pagination
-            currentPage={currentPage}
-            hasPrevious={state.hasPrevious}
-            hasNext={state.hasNext}
-            onPageChange={handlePageChange}
-          />
-        )}
+        {renderPagination()}
 
         <button type="button" className="error-btn" onClick={handleThrowError}>
           Throw Error
