@@ -3,7 +3,7 @@ import { ErrorBoundary } from './components/error-boundary/ErrorBoundary';
 import { QueryProvider } from './context/QueryProvider';
 import { ThemeProvider } from './context/ThemeProvider';
 import { AppRoutes } from './routes';
-import './App.css';
+import '@/styles/index.css';
 
 export default function App() {
   return (
