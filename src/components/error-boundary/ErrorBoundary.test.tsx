@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ErrorBoundary } from './ErrorBoundary';
 
+// Class component is required here: only class children can throw during render
+// in a way that Error Boundary catches reliably in tests.
 class ToggleBomb extends Component<Record<string, never>, { boom: boolean }> {
   constructor(props: Record<string, never>) {
     super(props);

@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchCharacterById } from '../api/swapi';
-import { queryKeys } from '../api/queryKeys';
+import { fetchCharacterById } from '@/api/swapi';
+import { queryKeys } from '@/api/queryKeys';
 
 export const useCharacterDetailsQuery = (id: string) =>
   useQuery({

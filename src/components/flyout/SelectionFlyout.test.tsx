@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Character } from '../../types/character';
-import { useSelectedItemsStore } from '../../store/selectedItemsStore';
-import * as downloadCsv from '../../utils/downloadCsv';
-import { SelectionFlyout } from './SelectionFlyout';
+import type { Character } from '@/types/character';
+import { useSelectedItemsStore } from '@/store/selectedItemsStore';
+import * as downloadCsv from '@/utils/downloadCsv';
+import { SelectionFlyout } from '@/components/flyout/SelectionFlyout';
 
 const character: Character = {
   name: 'Luke Skywalker',

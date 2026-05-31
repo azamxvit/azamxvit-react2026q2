@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { getCacheTtlMs } from './cacheConfig';
+import { getCacheTtlMs } from '@/lib/cacheConfig';
 
 export const createQueryClient = (): QueryClient => {
   const cacheTtlMs = getCacheTtlMs();

@@ -2,16 +2,16 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import { AppRoutes } from './routes';
-import * as swapi from './api/swapi';
-import { QueryProvider } from './context/QueryProvider';
-import { ThemeProvider } from './context/ThemeProvider';
-import { useSelectedItemsStore } from './store/selectedItemsStore';
-import { installLocalStorageMock } from './test-utils/localStorage';
-import { createTestQueryClient } from './test-utils/queryClient';
+import { AppRoutes } from '@/routes';
+import * as swapi from '@/api/swapi';
+import { QueryProvider } from '@/context/QueryProvider';
+import { ThemeProvider } from '@/context/ThemeProvider';
+import { useSelectedItemsStore } from '@/store/selectedItemsStore';
+import { installLocalStorageMock } from '@/test-utils/localStorage';
+import { createTestQueryClient } from '@/test-utils/queryClient';
 
-vi.mock('./api/swapi', async () => {
-  const actual = await vi.importActual<typeof swapi>('./api/swapi');
+vi.mock('@/api/swapi', async () => {
+  const actual = await vi.importActual<typeof swapi>('@/api/swapi');
   return {
     ...actual,
     fetchCharacters: vi.fn(),

@@ -1,13 +1,13 @@
-import type { ReactNode } from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import * as swapi from '../api/swapi';
-import { QueryProvider } from '../context/QueryProvider';
-import { useCharactersQuery } from './useCharactersQuery';
-import { createTestQueryClient } from '../test-utils/queryClient';
+import * as swapi from '@/api/swapi';
+import { QueryProvider } from '@/context/QueryProvider';
+import { useCharactersQuery } from '@/hooks/useCharactersQuery';
+import { createTestQueryClient } from '@/test-utils/queryClient';
 
-vi.mock('../api/swapi', async () => {
-  const actual = await vi.importActual<typeof swapi>('../api/swapi');
+vi.mock('@/api/swapi', async () => {
+  const actual = await vi.importActual<typeof swapi>('@/api/swapi');
   return {
     ...actual,
     fetchCharacters: vi.fn(),

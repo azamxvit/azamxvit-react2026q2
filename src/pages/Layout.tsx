@@ -1,7 +1,7 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import { ErrorBoundary } from '../components/error-boundary/ErrorBoundary';
-import { SelectionFlyout } from '../components/flyout/SelectionFlyout';
-import { ThemeToggle } from '../components/theme/ThemeToggle';
+import { ErrorBoundary } from '@/components/error-boundary/ErrorBoundary';
+import { SelectionFlyout } from '@/components/flyout/SelectionFlyout';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 export function Layout() {
   return (

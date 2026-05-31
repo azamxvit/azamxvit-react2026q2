@@ -1,5 +1,5 @@
-import { getCharacterId } from '../api/swapi';
-import type { Character } from '../types/character';
+import { getCharacterId } from '@/api/swapi';
+import type { Character } from '@/types/character';
 
 const escapeCsvField = (value: string): string => {
   if (/[",\n]/.test(value)) {

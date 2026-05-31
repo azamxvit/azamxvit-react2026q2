@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Character } from '../types/character';
+import type { Character } from '@/types/character';
 import { buildCsvContent, downloadSelectedItemsAsCsv } from './downloadCsv';
 
 const sampleItem: Character = {
