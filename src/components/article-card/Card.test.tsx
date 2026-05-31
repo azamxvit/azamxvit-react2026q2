@@ -2,10 +2,10 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, it, expect } from 'vitest';
 import { Route, Routes } from 'react-router-dom';
-import { Card } from './Card';
-import type { Character } from '../../types/character';
-import { useSelectedItemsStore } from '../../store/selectedItemsStore';
-import { renderWithRouter } from '../../test-utils/renderWithRouter';
+import { Card } from '@/components/article-card/Card';
+import type { Character } from '@/types/character';
+import { useSelectedItemsStore } from '@/store/selectedItemsStore';
+import { renderWithRouter } from '@/test-utils/renderWithRouter';
 
 const baseItem: Character = {
   name: 'Luke Skywalker',
@@ -20,7 +20,7 @@ describe('Card', () => {
   });
 
   it('displays name, birth year, and gender', () => {
-    renderWithRouter(<Card item={baseItem} />);
+    renderWithRouter(<Card {...baseItem} />);
 
     expect(screen.getByRole('heading', { name: 'Luke Skywalker' })).toBeInTheDocument();
     expect(screen.getByText('19BBY')).toBeInTheDocument();
@@ -31,7 +31,7 @@ describe('Card', () => {
     const user = userEvent.setup();
     renderWithRouter(
       <Routes>
-        <Route path="/" element={<Card item={baseItem} />} />
+        <Route path="/" element={<Card {...baseItem} />} />
         <Route path="/details/:id" element={<div data-testid="details-route">Details</div>} />
       </Routes>,
       { route: '/?page=2' },
@@ -46,7 +46,7 @@ describe('Card', () => {
     const user = userEvent.setup();
     renderWithRouter(
       <Routes>
-        <Route path="/" element={<Card item={baseItem} />} />
+        <Route path="/" element={<Card {...baseItem} />} />
         <Route path="/details/:id" element={<div data-testid="details-route">Details</div>} />
       </Routes>,
       { route: '/?page=1' },
@@ -67,7 +67,7 @@ describe('Card', () => {
   it('still renders labels when optional-looking fields are empty strings', () => {
     const item: Character = { ...baseItem, name: 'Unknown', birth_year: '', gender: '' };
 
-    renderWithRouter(<Card item={item} />);
+    renderWithRouter(<Card {...item} />);
 
     expect(screen.getByRole('heading', { name: 'Unknown' })).toBeInTheDocument();
     expect(screen.getByText(/Birth Year/i)).toBeInTheDocument();

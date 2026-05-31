@@ -1,29 +1,22 @@
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getCharacterId } from '../../api/swapi';
-import { useSelectedItemsStore } from '../../store/selectedItemsStore';
-import type { Character } from '../../types/character';
+import { getCharacterId } from '@/api/swapi';
+import { useSelectedItemsStore } from '@/store/selectedItemsStore';
+import type { CardProps } from './Card.types';
+import './Card.css';
 
-interface Props {
-  item: Character;
-}
-
-export function Card({ item }: Props) {
+export function Card({ name, birth_year, gender, url }: CardProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const id = getCharacterId(item.url);
+  const id = getCharacterId(url);
 
-  const isSelected = useSelectedItemsStore((state) => state.isSelected(item.url));
+  const isSelected = useSelectedItemsStore((state) => state.isSelected(url));
   const toggleItem = useSelectedItemsStore((state) => state.toggleItem);
 
   const openDetails = () => {
     const params = new URLSearchParams(searchParams);
     params.set('details', id);
     navigate(`/details/${id}?${params.toString()}`);
-  };
-
-  const handleCardClick = () => {
-    openDetails();
   };
 
   const handleCardKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -35,13 +28,13 @@ export function Card({ item }: Props) {
 
   const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
-    toggleItem(item);
+    toggleItem({ name, birth_year, gender, url });
   };
 
   return (
     <div
       className="card"
-      onClick={handleCardClick}
+      onClick={openDetails}
       onKeyDown={handleCardKeyDown}
       role="button"
       tabIndex={0}
@@ -53,16 +46,16 @@ export function Card({ item }: Props) {
           checked={isSelected}
           onChange={handleCheckboxChange}
           onClick={(e) => e.stopPropagation()}
-          aria-label={`Select ${item.name}`}
+          aria-label={`Select ${name}`}
           data-testid="character-checkbox"
         />
       </label>
-      <h3>{item.name}</h3>
+      <h3>{name}</h3>
       <p>
-        <strong>Birth Year:</strong> {item.birth_year}
+        <strong>Birth Year:</strong> {birth_year}
       </p>
       <p>
-        <strong>Gender:</strong> {item.gender}
+        <strong>Gender:</strong> {gender}
       </p>
     </div>
   );

@@ -1,8 +1,8 @@
 import { screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { CardList } from './CardList';
-import type { Character } from '../../types/character';
-import { renderWithRouter } from '../../test-utils/renderWithRouter';
+import { CardList } from '@/components/article-list/CardList';
+import type { Character } from '@/types/character';
+import { renderWithRouter } from '@/test-utils/renderWithRouter';
 
 const buildCharacter = (overrides: Partial<Character> = {}): Character => ({
   name: 'Luke Skywalker',
