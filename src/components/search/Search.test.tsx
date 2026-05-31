@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { Search } from './Search';
-import { renderWithRouter } from '../../test-utils/renderWithRouter';
+import { renderWithRouter } from '@/test-utils/renderWithRouter';
 
 describe('Search', () => {
   it('renders search input and submit button', () => {

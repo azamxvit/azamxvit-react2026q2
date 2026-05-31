@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { MouseEvent } from 'react';
 import { Outlet, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { CardList } from '../components/article-list/CardList';
-import { Loader } from '../components/skeleton/Loader';
-import { Pagination } from '../components/pagination/Pagination';
-import { Search } from '../components/search/Search';
-import { useCharactersQuery, useInvalidateCharacters } from '../hooks/useCharactersQuery';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { CardList } from '@/components/article-list/CardList';
+import { Loader } from '@/components/skeleton/Loader';
+import { Pagination } from '@/components/pagination/Pagination';
+import { Search } from '@/components/search/Search';
+import { UI_LABELS } from '@/constants/labels';
+import { useCharactersQuery, useInvalidateCharacters } from '@/hooks/useCharactersQuery';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { getErrorMessage } from '@/lib/getErrorMessage';
 
 const SEARCH_STORAGE_KEY = 'rss_search_term';
 
@@ -79,11 +81,7 @@ export function Home() {
   }
 
   const results = data?.results ?? [];
-  const errorMessage = isError
-    ? error instanceof Error
-      ? error.message
-      : 'Unknown error occurred'
-    : null;
+  const errorMessage = isError ? getErrorMessage(error) : null;
   const showPagination = !isLoading && !errorMessage && results.length > 0;
   const showLoader = isLoading || (isFetching && !data);
 
@@ -128,9 +126,9 @@ export function Home() {
             className="refresh-btn"
             onClick={handleRefresh}
             disabled={isFetching}
-            aria-label="Refresh character list"
+            aria-label={UI_LABELS.refresh.listAria}
           >
-            Refresh
+            {UI_LABELS.refresh.list}
           </button>
         </div>
 

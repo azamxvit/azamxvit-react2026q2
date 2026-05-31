@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
+import { UI_LABELS } from '@/constants/labels';
 
 interface Props {
   initialValue: string;
@@ -24,9 +25,9 @@ export function Search({ initialValue, onSearch }: Props) {
         type="text"
         value={inputValue}
         onChange={handleChange}
-        placeholder="Search Star Wars characters..."
+        placeholder={UI_LABELS.search.placeholder}
       />
-      <button type="submit">Search</button>
+      <button type="submit">{UI_LABELS.search.submit}</button>
     </form>
   );
 }

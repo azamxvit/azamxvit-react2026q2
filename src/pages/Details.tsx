@@ -1,10 +1,12 @@
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Loader } from '@/components/skeleton/Loader';
+import { UI_LABELS } from '@/constants/labels';
 import {
   useCharacterDetailsQuery,
   useInvalidateCharacterDetails,
-} from '../hooks/useCharacterDetailsQuery';
-import { Loader } from '../components/skeleton/Loader';
-import type { CharacterDetails } from '../types/character';
+} from '@/hooks/useCharacterDetailsQuery';
+import { getErrorMessage } from '@/lib/getErrorMessage';
+import type { CharacterDetails } from '@/types/character';
 
 export function Details() {
   const { id } = useParams();
@@ -25,11 +27,7 @@ export function Details() {
     void invalidateCharacterDetails(characterId);
   };
 
-  const errorMessage = isError
-    ? error instanceof Error
-      ? error.message
-      : 'Unknown error occurred'
-    : null;
+  const errorMessage = isError ? getErrorMessage(error) : null;
   const showLoader = isLoading || (isFetching && !data);
 
   const renderDetailsContent = (character: CharacterDetails) => (
@@ -61,7 +59,7 @@ export function Details() {
 
   const renderBody = () => {
     if (showLoader) {
-      return <Loader label="Loading details..." />;
+      return <Loader label={UI_LABELS.details.loading} />;
     }
 
     if (errorMessage) {
@@ -83,15 +81,15 @@ export function Details() {
           className="refresh-btn"
           onClick={handleRefresh}
           disabled={isFetching || !characterId}
-          aria-label="Refresh character details"
+          aria-label={UI_LABELS.refresh.detailsAria}
         >
-          Refresh
+          {UI_LABELS.refresh.details}
         </button>
         <button
           type="button"
           className="details__close"
           onClick={handleClose}
-          aria-label="Close details"
+          aria-label={UI_LABELS.details.closeAria}
         >
           ×
         </button>
