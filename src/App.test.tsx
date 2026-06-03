@@ -344,6 +344,21 @@ describe('App routing & home page', () => {
     await waitFor(() => expect(fetchCharacters).toHaveBeenCalledTimes(2));
   });
 
+  it('refetches list and open details when list Refresh is clicked with details panel open', async () => {
+    installLocalStorageMock();
+    const user = userEvent.setup();
+    renderApp('/details/1?page=1');
+
+    await screen.findByRole('heading', { name: 'Luke Skywalker' });
+    expect(fetchCharacters).toHaveBeenCalledTimes(1);
+    expect(fetchCharacterById).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: /refresh character list/i }));
+
+    await waitFor(() => expect(fetchCharacters).toHaveBeenCalledTimes(2));
+    expect(fetchCharacterById).toHaveBeenCalledTimes(2);
+  });
+
   it('reuses cached character details when reopening the same item', async () => {
     installLocalStorageMock();
     const user = userEvent.setup();

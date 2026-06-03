@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { MouseEvent } from 'react';
+import { useIsFetching } from '@tanstack/react-query';
 import { Outlet, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { queryKeys } from '@/api/queryKeys';
 import { CardList } from '@/components/article-list/CardList';
 import { Loader } from '@/components/skeleton/Loader';
 import { Pagination } from '@/components/pagination/Pagination';
 import { Search } from '@/components/search/Search';
 import { UI_LABELS } from '@/constants/labels';
-import { useCharactersQuery, useInvalidateCharacters } from '@/hooks/useCharactersQuery';
+import { useCharactersQuery } from '@/hooks/useCharactersQuery';
+import { useInvalidateDashboard } from '@/hooks/useInvalidateDashboard';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { getErrorMessage } from '@/lib/getErrorMessage';
 
@@ -28,7 +31,11 @@ export function Home() {
     searchTerm,
     currentPage,
   );
-  const invalidateCharacters = useInvalidateCharacters();
+  const invalidateDashboard = useInvalidateDashboard();
+  const isDetailsFetching = useIsFetching(
+    detailsId ? { queryKey: queryKeys.character.detail(detailsId) } : { queryKey: [] },
+  );
+  const isRefreshing = isFetching || (detailsId ? isDetailsFetching > 0 : false);
 
   useEffect(() => {
     if (!searchParams.get('page')) {
@@ -72,7 +79,11 @@ export function Home() {
   );
 
   const handleRefresh = () => {
-    void invalidateCharacters(searchTerm, currentPage);
+    void invalidateDashboard({
+      search: searchTerm,
+      page: currentPage,
+      detailsId,
+    });
   };
 
   const handleThrowError = () => setTriggerError(true);
@@ -125,7 +136,7 @@ export function Home() {
             type="button"
             className="refresh-btn"
             onClick={handleRefresh}
-            disabled={isFetching}
+            disabled={isRefreshing}
             aria-label={UI_LABELS.refresh.listAria}
           >
             {UI_LABELS.refresh.list}
