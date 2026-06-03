@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Character } from '../types/character';
+import type { Character } from '@/types/character';
 
 interface SelectedItemsState {
   itemsByUrl: Record<string, Character>;

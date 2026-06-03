@@ -1,10 +1,11 @@
 import '@testing-library/jest-dom/vitest';
 import { beforeEach } from 'vitest';
-import { useSelectedItemsStore } from './store/selectedItemsStore';
+import { THEME } from '@/context/themeContext';
+import { useSelectedItemsStore } from '@/store/selectedItemsStore';
 
 beforeEach(() => {
   useSelectedItemsStore.setState({ itemsByUrl: {} });
-  document.documentElement.setAttribute('data-theme', 'light');
+  document.documentElement.setAttribute('data-theme', THEME.LIGHT);
 });
 import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';

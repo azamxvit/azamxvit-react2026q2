@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { ThemeProvider } from './ThemeProvider';
-import { useTheme } from './useTheme';
-import { ThemeToggle } from '../components/theme/ThemeToggle';
+import { THEME } from '@/context/themeContext';
+import { ThemeProvider } from '@/context/ThemeProvider';
+import { useTheme } from '@/context/useTheme';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 function ThemeReader() {
   const { theme } = useTheme();
@@ -18,8 +19,8 @@ describe('ThemeContext', () => {
       </ThemeProvider>,
     );
 
-    expect(document.documentElement.getAttribute('data-theme')).toBe('light');
-    expect(screen.getByTestId('current-theme')).toHaveTextContent('light');
+    expect(document.documentElement.getAttribute('data-theme')).toBe(THEME.LIGHT);
+    expect(screen.getByTestId('current-theme')).toHaveTextContent(THEME.LIGHT);
   });
 
   it('throws when useTheme is used outside ThemeProvider', () => {

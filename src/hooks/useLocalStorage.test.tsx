@@ -2,7 +2,7 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useLocalStorage } from './useLocalStorage';
-import { installLocalStorageMock } from '../test-utils/localStorage';
+import { installLocalStorageMock } from '@/test-utils/localStorage';
 
 function Probe({ storageKey, initial }: { storageKey: string; initial?: string }) {
   const [value, setValue] = useLocalStorage(storageKey, initial);

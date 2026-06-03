@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { About } from './About';
-import { renderWithRouter } from '../test-utils/renderWithRouter';
+import { renderWithRouter } from '@/test-utils/renderWithRouter';
 
 describe('About page', () => {
   it('shows author information and a link to the RS School React course', () => {

@@ -1,11 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import App from './App';
-import * as swapi from './api/swapi';
-import { installLocalStorageMock } from './test-utils/localStorage';
+import App from '@/App';
+import * as swapi from '@/api/swapi';
+import { installLocalStorageMock } from '@/test-utils/localStorage';
 
-vi.mock('./api/swapi', async () => {
-  const actual = await vi.importActual<typeof swapi>('./api/swapi');
+vi.mock('@/api/swapi', async () => {
+  const actual = await vi.importActual<typeof swapi>('@/api/swapi');
   return {
     ...actual,
     fetchCharacters: vi.fn(),

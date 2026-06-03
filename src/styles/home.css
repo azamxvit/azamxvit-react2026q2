@@ -1,0 +1,56 @@
+.home {
+  display: block;
+}
+
+.home--split {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 16px;
+}
+
+.home__main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.home__details {
+  padding: 16px;
+  background-color: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  position: relative;
+}
+
+.top-controls {
+  padding: 20px;
+  background-color: var(--bg-surface);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.results-section {
+  flex-grow: 1;
+  padding: 20px;
+  border: 2px dashed var(--border-dashed);
+  border-radius: 8px;
+  background-color: var(--bg-card);
+}
+
+.error-btn {
+  margin-top: 8px;
+  padding: 10px 15px;
+  background-color: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.error-btn:hover {
+  background-color: var(--danger-hover);
+}

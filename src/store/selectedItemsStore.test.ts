@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { Character } from '../types/character';
-import { useSelectedItemsStore } from './selectedItemsStore';
+import type { Character } from '@/types/character';
+import { useSelectedItemsStore } from '@/store/selectedItemsStore';
 
 const character: Character = {
   name: 'Luke Skywalker',

@@ -1,5 +1,5 @@
-import { useSelectedItemsStore } from '../../store/selectedItemsStore';
-import { downloadSelectedItemsAsCsv } from '../../utils/downloadCsv';
+import { useSelectedItemsStore } from '@/store/selectedItemsStore';
+import { downloadSelectedItemsAsCsv } from '@/utils/downloadCsv';
 
 export function SelectionFlyout() {
   const itemsByUrl = useSelectedItemsStore((state) => state.itemsByUrl);

@@ -1,96 +1,101 @@
-import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { fetchCharacterById } from '../api/swapi';
-import { Loader } from '../components/skeleton/Loader';
-import type { CharacterDetails } from '../types/character';
-
-interface DetailsState {
-  data: CharacterDetails | null;
-  isLoading: boolean;
-  error: string | null;
-}
-
-const initialState: DetailsState = {
-  data: null,
-  isLoading: false,
-  error: null,
-};
+import { Loader } from '@/components/skeleton/Loader';
+import { UI_LABELS } from '@/constants/labels';
+import {
+  useCharacterDetailsQuery,
+  useInvalidateCharacterDetails,
+} from '@/hooks/useCharacterDetailsQuery';
+import { getErrorMessage } from '@/lib/getErrorMessage';
+import type { CharacterDetails } from '@/types/character';
 
 export function Details() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [state, setState] = useState<DetailsState>(initialState);
+  const characterId = id ?? '';
 
-  useEffect(() => {
-    if (!id) return;
-    let cancelled = false;
-
-    const load = async () => {
-      setState({ data: null, isLoading: true, error: null });
-      try {
-        const data = await fetchCharacterById(id);
-        if (cancelled) return;
-        setState({ data, isLoading: false, error: null });
-      } catch (error) {
-        if (cancelled) return;
-        setState({
-          data: null,
-          isLoading: false,
-          error: error instanceof Error ? error.message : 'Unknown error occurred',
-        });
-      }
-    };
-
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
+  const { data, isLoading, isFetching, isError, error } =
+    useCharacterDetailsQuery(characterId);
+  const invalidateCharacterDetails = useInvalidateCharacterDetails();
 
   const handleClose = () => {
     navigate({ pathname: '/', search: `?${searchParams.toString()}` });
   };
 
+  const handleRefresh = () => {
+    if (!characterId) return;
+    void invalidateCharacterDetails(characterId);
+  };
+
+  const errorMessage = isError ? getErrorMessage(error) : null;
+  const showLoader = isLoading || (isFetching && !data);
+
+  const renderDetailsContent = (character: CharacterDetails) => (
+    <article>
+      <h2>{character.name}</h2>
+      <p>
+        <strong>Birth Year:</strong> {character.birth_year}
+      </p>
+      <p>
+        <strong>Gender:</strong> {character.gender}
+      </p>
+      <p>
+        <strong>Height:</strong> {character.height}
+      </p>
+      <p>
+        <strong>Mass:</strong> {character.mass}
+      </p>
+      <p>
+        <strong>Hair color:</strong> {character.hair_color}
+      </p>
+      <p>
+        <strong>Skin color:</strong> {character.skin_color}
+      </p>
+      <p>
+        <strong>Eye color:</strong> {character.eye_color}
+      </p>
+    </article>
+  );
+
+  const renderBody = () => {
+    if (showLoader) {
+      return <Loader label={UI_LABELS.details.loading} />;
+    }
+
+    if (errorMessage) {
+      return <div className="api-error">{errorMessage}</div>;
+    }
+
+    if (data) {
+      return renderDetailsContent(data);
+    }
+
+    return null;
+  };
+
   return (
     <div className="details">
-      <button
-        type="button"
-        className="details__close"
-        onClick={handleClose}
-        aria-label="Close details"
-      >
-        ×
-      </button>
+      <div className="details__toolbar">
+        <button
+          type="button"
+          className="refresh-btn"
+          onClick={handleRefresh}
+          disabled={isFetching || !characterId}
+          aria-label={UI_LABELS.refresh.detailsAria}
+        >
+          {UI_LABELS.refresh.details}
+        </button>
+        <button
+          type="button"
+          className="details__close"
+          onClick={handleClose}
+          aria-label={UI_LABELS.details.closeAria}
+        >
+          ×
+        </button>
+      </div>
 
-      {state.isLoading && <Loader label="Loading details..." />}
-      {state.error && <div className="api-error">{state.error}</div>}
-      {state.data && (
-        <article>
-          <h2>{state.data.name}</h2>
-          <p>
-            <strong>Birth Year:</strong> {state.data.birth_year}
-          </p>
-          <p>
-            <strong>Gender:</strong> {state.data.gender}
-          </p>
-          <p>
-            <strong>Height:</strong> {state.data.height}
-          </p>
-          <p>
-            <strong>Mass:</strong> {state.data.mass}
-          </p>
-          <p>
-            <strong>Hair color:</strong> {state.data.hair_color}
-          </p>
-          <p>
-            <strong>Skin color:</strong> {state.data.skin_color}
-          </p>
-          <p>
-            <strong>Eye color:</strong> {state.data.eye_color}
-          </p>
-        </article>
-      )}
+      {renderBody()}
     </div>
   );
 }

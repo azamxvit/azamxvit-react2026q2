@@ -2,14 +2,16 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import { AppRoutes } from './routes';
-import * as swapi from './api/swapi';
-import { ThemeProvider } from './context/ThemeProvider';
-import { useSelectedItemsStore } from './store/selectedItemsStore';
-import { installLocalStorageMock } from './test-utils/localStorage';
+import { AppRoutes } from '@/routes';
+import * as swapi from '@/api/swapi';
+import { QueryProvider } from '@/context/QueryProvider';
+import { ThemeProvider } from '@/context/ThemeProvider';
+import { useSelectedItemsStore } from '@/store/selectedItemsStore';
+import { installLocalStorageMock } from '@/test-utils/localStorage';
+import { createTestQueryClient } from '@/test-utils/queryClient';
 
-vi.mock('./api/swapi', async () => {
-  const actual = await vi.importActual<typeof swapi>('./api/swapi');
+vi.mock('@/api/swapi', async () => {
+  const actual = await vi.importActual<typeof swapi>('@/api/swapi');
   return {
     ...actual,
     fetchCharacters: vi.fn(),
@@ -29,11 +31,13 @@ const sampleCharacter = {
 
 const renderApp = (route = '/') =>
   render(
-    <ThemeProvider>
-      <MemoryRouter initialEntries={[route]}>
-        <AppRoutes />
-      </MemoryRouter>
-    </ThemeProvider>,
+    <QueryProvider client={createTestQueryClient()}>
+      <ThemeProvider>
+        <MemoryRouter initialEntries={[route]}>
+          <AppRoutes />
+        </MemoryRouter>
+      </ThemeProvider>
+    </QueryProvider>,
   );
 
 describe('App routing & home page', () => {
@@ -138,7 +142,13 @@ describe('App routing & home page', () => {
 
     await user.click(within(pagination).getByRole('button', { name: /next/i }));
     await waitFor(() => expect(fetchCharacters).toHaveBeenLastCalledWith('', 2));
-    expect(within(pagination).getByTestId('current-page')).toHaveTextContent('Page 2');
+    await waitFor(() =>
+      expect(
+        within(screen.getByRole('navigation', { name: /pagination/i })).getByTestId(
+          'current-page',
+        ),
+      ).toHaveTextContent('Page 2'),
+    );
   });
 
   it('hides pagination while loading or when an error happens', async () => {
@@ -303,5 +313,77 @@ describe('App routing & home page', () => {
     await user.click(screen.getByRole('radio', { name: /dark/i }));
 
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+  });
+
+  it('reuses cached list data when returning to a previously visited page', async () => {
+    installLocalStorageMock();
+    const user = userEvent.setup();
+    renderApp('/?page=1');
+
+    await screen.findByText('Luke Skywalker');
+    expect(fetchCharacters).toHaveBeenCalledTimes(1);
+
+    const pagination = screen.getByRole('navigation', { name: /pagination/i });
+    await user.click(within(pagination).getByRole('button', { name: /next/i }));
+    await waitFor(() => expect(fetchCharacters).toHaveBeenCalledTimes(2));
+
+    await user.click(within(pagination).getByRole('button', { name: /prev/i }));
+    await screen.findByText('Luke Skywalker');
+    expect(fetchCharacters).toHaveBeenCalledTimes(2);
+  });
+
+  it('refetches list data when Refresh is clicked', async () => {
+    installLocalStorageMock();
+    const user = userEvent.setup();
+    renderApp('/');
+
+    await screen.findByText('Luke Skywalker');
+    expect(fetchCharacters).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: /refresh character list/i }));
+    await waitFor(() => expect(fetchCharacters).toHaveBeenCalledTimes(2));
+  });
+
+  it('refetches list and open details when list Refresh is clicked with details panel open', async () => {
+    installLocalStorageMock();
+    const user = userEvent.setup();
+    renderApp('/details/1?page=1');
+
+    await screen.findByRole('heading', { name: 'Luke Skywalker' });
+    expect(fetchCharacters).toHaveBeenCalledTimes(1);
+    expect(fetchCharacterById).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: /refresh character list/i }));
+
+    await waitFor(() => expect(fetchCharacters).toHaveBeenCalledTimes(2));
+    expect(fetchCharacterById).toHaveBeenCalledTimes(2);
+  });
+
+  it('reuses cached character details when reopening the same item', async () => {
+    installLocalStorageMock();
+    const user = userEvent.setup();
+    renderApp('/details/1?page=1');
+
+    await screen.findByRole('heading', { name: 'Luke Skywalker' });
+    expect(fetchCharacterById).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: /close details/i }));
+    await waitFor(() => expect(screen.queryByTestId('details-panel')).not.toBeInTheDocument());
+
+    await user.click(screen.getByTestId('character-card'));
+    await screen.findByTestId('details-panel');
+    expect(fetchCharacterById).toHaveBeenCalledTimes(1);
+  });
+
+  it('refetches details when Refresh is clicked', async () => {
+    installLocalStorageMock();
+    const user = userEvent.setup();
+    renderApp('/details/1?page=1');
+
+    await screen.findByRole('heading', { name: 'Luke Skywalker' });
+    expect(fetchCharacterById).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: /refresh character details/i }));
+    await waitFor(() => expect(fetchCharacterById).toHaveBeenCalledTimes(2));
   });
 });
