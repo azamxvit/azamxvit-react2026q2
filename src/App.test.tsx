@@ -6,6 +6,7 @@ import { AppRoutes } from '@/routes';
 import * as swapi from '@/api/swapi';
 import { QueryProvider } from '@/context/QueryProvider';
 import { ThemeProvider } from '@/context/ThemeProvider';
+import { useFormStore } from '@/store/formStore';
 import { useSelectedItemsStore } from '@/store/selectedItemsStore';
 import { installLocalStorageMock } from '@/test-utils/localStorage';
 import { createTestQueryClient } from '@/test-utils/queryClient';
@@ -43,6 +44,7 @@ const renderApp = (route = '/') =>
 describe('App routing & home page', () => {
   beforeEach(() => {
     useSelectedItemsStore.setState({ itemsByUrl: {} });
+    useFormStore.getState().resetStore();
     vi.clearAllMocks();
     fetchCharacters.mockResolvedValue({
       count: 12,

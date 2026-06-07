@@ -4,6 +4,7 @@ import { useIsFetching } from '@tanstack/react-query';
 import { Outlet, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { queryKeys } from '@/api/queryKeys';
 import { CardList } from '@/components/article-list/CardList';
+import { FormsSection } from '@/components/forms/FormsSection';
 import { Loader } from '@/components/skeleton/Loader';
 import { Pagination } from '@/components/pagination/Pagination';
 import { Search } from '@/components/search/Search';
@@ -130,6 +131,8 @@ export function Home() {
         onClick={handleCloseDetails}
         data-testid="main-panel"
       >
+        <FormsSection />
+
         <div className="top-controls">
           <Search initialValue={searchTerm} onSearch={handleSearch} />
           <button
