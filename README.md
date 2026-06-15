@@ -1,1 +1,1 @@
-# RS School React Task
+# react-performance
