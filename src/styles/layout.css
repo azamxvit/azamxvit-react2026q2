@@ -1,0 +1,117 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 20px;
+  padding-bottom: 100px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  color: var(--text-primary);
+  background-color: var(--bg-page);
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 20px;
+  background-color: var(--bg-surface);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.app-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  text-decoration: none;
+}
+
+.app-title__icon {
+  flex-shrink: 0;
+}
+
+.language-switcher {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.language-switcher__label {
+  font-weight: 600;
+}
+
+.language-switcher__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.app-sr-image {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-toggle__label {
+  font-weight: 600;
+}
+
+.theme-toggle__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
+.app-nav {
+  display: flex;
+  gap: 16px;
+}
+
+.app-nav a {
+  color: var(--link-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.app-nav a.active {
+  text-decoration: underline;
+}
+
+.about,
+.not-found {
+  padding: 20px;
+  background-color: var(--bg-card);
+  border: 2px dashed var(--border-dashed);
+  border-radius: 8px;
+}
+
+.about__logo,
+.about__badge {
+  margin-bottom: 16px;
+}
+
+.not-found__link {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--link-color);
+}

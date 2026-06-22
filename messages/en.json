@@ -1,0 +1,75 @@
+{
+  "app": {
+    "title": "Star Wars Explorer",
+    "nav": {
+      "home": "Home",
+      "about": "About"
+    },
+    "language": {
+      "label": "Language:",
+      "en": "English",
+      "ru": "Russian",
+      "kz": "Kazakh"
+    }
+  },
+  "search": {
+    "placeholder": "Search Star Wars characters...",
+    "submit": "Search"
+  },
+  "pagination": {
+    "ariaLabel": "Pagination",
+    "prev": "Prev",
+    "next": "Next",
+    "page": "Page {page}"
+  },
+  "theme": {
+    "label": "Theme:",
+    "light": "light",
+    "dark": "dark"
+  },
+  "refresh": {
+    "list": "Refresh",
+    "listAria": "Refresh character list",
+    "details": "Refresh",
+    "detailsAria": "Refresh character details"
+  },
+  "details": {
+    "closeAria": "Close details",
+    "loading": "Loading details...",
+    "birthYear": "Birth Year",
+    "gender": "Gender",
+    "height": "Height",
+    "mass": "Mass",
+    "hairColor": "Hair color",
+    "skinColor": "Skin color",
+    "eyeColor": "Eye color"
+  },
+  "flyout": {
+    "selected": "{count, plural, one {# item selected} other {# items selected}}",
+    "unselectAll": "Unselect all",
+    "download": "Download"
+  },
+  "results": {
+    "empty": "No results found.",
+    "error": "Unknown error occurred"
+  },
+  "about": {
+    "title": "About",
+    "description": "Star Wars Explorer is a small training application built for the Rolling Scopes School React course. It demonstrates routing, server rendering, pagination, and master-detail layouts with Next.js App Router.",
+    "author": "Author:",
+    "authorName": "azamxvit",
+    "source": "Source:",
+    "sourceLabel": "RS School React tasks",
+    "courseLink": "Rolling Scopes School React course"
+  },
+  "notFound": {
+    "title": "404 — Page not found",
+    "description": "The page you are looking for does not exist.",
+    "back": "Back to home"
+  },
+  "error": {
+    "title": "Something went wrong.",
+    "reload": "Reload Page",
+    "throw": "Throw Error"
+  }
+}

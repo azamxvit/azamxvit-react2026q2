@@ -1,0 +1,33 @@
+.card {
+  display: block;
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  background-color: var(--bg-card);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card__checkbox {
+  display: flex;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.card__link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.card h3 {
+  margin-top: 0;
+  color: var(--text-heading);
+}
