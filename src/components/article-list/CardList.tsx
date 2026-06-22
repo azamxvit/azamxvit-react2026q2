@@ -1,5 +1,5 @@
-import type { Character } from '@/types/character';
-import { Card } from '@/components/article-card/Card';
+import { Card } from '@/components/article-card';
+import type { Character } from '@/types';
 import './CardList.css';
 
 interface Props {
@@ -7,10 +7,6 @@ interface Props {
 }
 
 export function CardList({ items }: Props) {
-  if (items.length === 0) {
-    return <p>No results found.</p>;
-  }
-
   return (
     <div className="card-list">
       {items.map((item) => (

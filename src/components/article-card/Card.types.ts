@@ -1,3 +1,3 @@
-import type { Character } from '@/types/character';
+import type { Character } from '@/types';
 
 export type CardProps = Character;

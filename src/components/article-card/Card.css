@@ -21,6 +21,12 @@
   cursor: pointer;
 }
 
+.card__link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
 .card h3 {
   margin-top: 0;
   color: var(--text-heading);

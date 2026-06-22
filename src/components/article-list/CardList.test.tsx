@@ -1,8 +1,19 @@
 import { screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import { CardList } from '@/components/article-list/CardList';
-import type { Character } from '@/types/character';
-import { renderWithRouter } from '@/test-utils/renderWithRouter';
+import { describe, expect, it, vi } from 'vitest';
+import { CardList } from '@/components/article-list';
+import type { Character } from '@/types';
+import { renderWithProviders } from '@/test-utils';
+
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams('page=1'),
+  usePathname: () => '/en',
+}));
+
+vi.mock('@/i18n/navigation', () => ({
+  Link: ({ href, children }: { href: string; children: React.ReactNode }) => (
+    <a href={href}>{children}</a>
+  ),
+}));
 
 const buildCharacter = (overrides: Partial<Character> = {}): Character => ({
   name: 'Luke Skywalker',
@@ -19,15 +30,15 @@ describe('CardList', () => {
       buildCharacter({ url: 'https://swapi.py4e.com/api/people/2/', name: 'C-3PO' }),
     ];
 
-    renderWithRouter(<CardList items={items} />);
+    renderWithProviders(<CardList items={items} />);
 
     expect(screen.getByText('Luke')).toBeInTheDocument();
     expect(screen.getByText('C-3PO')).toBeInTheDocument();
   });
 
-  it('shows a no-results message when the list is empty', () => {
-    renderWithRouter(<CardList items={[]} />);
+  it('renders an empty list container when no items are provided', () => {
+    const { container } = renderWithProviders(<CardList items={[]} />);
 
-    expect(screen.getByText('No results found.')).toBeInTheDocument();
+    expect(container.querySelector('.card-list')?.children.length).toBe(0);
   });
 });

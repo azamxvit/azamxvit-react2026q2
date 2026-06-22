@@ -1,4 +1,4 @@
-import type { ApiResponse, CharacterDetails } from '@/types/character';
+import type { ApiResponse, CharacterDetails } from '@/types';
 
 const BASE_URL = 'https://swapi.py4e.com/api/people';
 

@@ -6,6 +6,7 @@
   padding: 12px 0;
 }
 
+.pagination a,
 .pagination button {
   padding: 8px 14px;
   font-size: 14px;
@@ -14,9 +15,14 @@
   color: white;
   border: none;
   border-radius: 4px;
+  text-decoration: none;
 }
 
-.pagination button:disabled {
+.pagination button:disabled,
+.pagination__disabled {
   background-color: var(--muted);
   cursor: not-allowed;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 4px;
 }

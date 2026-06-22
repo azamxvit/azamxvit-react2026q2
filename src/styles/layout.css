@@ -25,10 +25,43 @@
 }
 
 .app-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--text-heading);
   text-decoration: none;
+}
+
+.app-title__icon {
+  flex-shrink: 0;
+}
+
+.language-switcher {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.language-switcher__label {
+  font-weight: 600;
+}
+
+.language-switcher__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.app-sr-image {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
 .theme-toggle {
@@ -70,6 +103,11 @@
   background-color: var(--bg-card);
   border: 2px dashed var(--border-dashed);
   border-radius: 8px;
+}
+
+.about__logo,
+.about__badge {
+  margin-bottom: 16px;
 }
 
 .not-found__link {

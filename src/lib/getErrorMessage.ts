@@ -1,4 +1,11 @@
-import { UI_LABELS } from '@/constants/labels';
+export const getErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message;
+  }
 
-export const getErrorMessage = (error: unknown): string =>
-  error instanceof Error ? error.message : UI_LABELS.errors.unknown;
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  return 'Unknown error occurred';
+};

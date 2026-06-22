@@ -1,15 +1,17 @@
-import { THEME } from '@/context/themeContext';
-import { useTheme } from '@/context/useTheme';
-import { UI_LABELS } from '@/constants/labels';
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { THEME, useTheme } from '@/context';
 
 const themeOptions = Object.values(THEME);
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const t = useTranslations('theme');
 
   return (
     <div className="theme-toggle" data-testid="theme-toggle">
-      <span className="theme-toggle__label">{UI_LABELS.theme.label}</span>
+      <span className="theme-toggle__label">{t('label')}</span>
       {themeOptions.map((option) => (
         <label key={option} className="theme-toggle__option">
           <input
@@ -19,7 +21,7 @@ export function ThemeToggle() {
             checked={theme === option}
             onChange={() => setTheme(option)}
           />
-          {option}
+          {t(option)}
         </label>
       ))}
     </div>

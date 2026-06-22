@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { THEME } from '@/context/themeContext';
-import { ThemeProvider } from '@/context/ThemeProvider';
-import { useTheme } from '@/context/useTheme';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { NextIntlClientProvider } from 'next-intl';
+import { THEME, ThemeProvider, useTheme } from '@/context';
+import { ThemeToggle } from '@/components/theme';
+import messages from '../../messages/en.json';
 
 function ThemeReader() {
   const { theme } = useTheme();
@@ -13,10 +13,12 @@ function ThemeReader() {
 describe('ThemeContext', () => {
   it('applies the theme attribute to document.documentElement', () => {
     render(
-      <ThemeProvider>
-        <ThemeToggle />
-        <ThemeReader />
-      </ThemeProvider>,
+      <NextIntlClientProvider locale="en" messages={messages}>
+        <ThemeProvider>
+          <ThemeToggle />
+          <ThemeReader />
+        </ThemeProvider>
+      </NextIntlClientProvider>,
     );
 
     expect(document.documentElement.getAttribute('data-theme')).toBe(THEME.LIGHT);
