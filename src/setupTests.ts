@@ -1,7 +1,12 @@
 import '@testing-library/jest-dom/vitest';
-import { beforeEach } from 'vitest';
-import { THEME } from '@/context/themeContext';
-import { useSelectedItemsStore } from '@/store/selectedItemsStore';
+import { beforeEach, vi } from 'vitest';
+import { THEME } from '@/constants';
+import { useSelectedItemsStore } from '@/store';
+
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams('page=1'),
+  usePathname: () => '/en',
+}));
 
 beforeEach(() => {
   useSelectedItemsStore.setState({ itemsByUrl: {} });
