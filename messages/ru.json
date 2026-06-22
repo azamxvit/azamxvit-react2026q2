@@ -1,0 +1,75 @@
+{
+  "app": {
+    "title": "Исследователь Звёздных войн",
+    "nav": {
+      "home": "Главная",
+      "about": "О проекте"
+    },
+    "language": {
+      "label": "Язык:",
+      "en": "English",
+      "ru": "Русский",
+      "kz": "Қазақша"
+    }
+  },
+  "search": {
+    "placeholder": "Поиск персонажей Звёздных войн...",
+    "submit": "Искать"
+  },
+  "pagination": {
+    "ariaLabel": "Пагинация",
+    "prev": "Назад",
+    "next": "Вперёд",
+    "page": "Страница {page}"
+  },
+  "theme": {
+    "label": "Тема:",
+    "light": "светлая",
+    "dark": "тёмная"
+  },
+  "refresh": {
+    "list": "Обновить",
+    "listAria": "Обновить список персонажей",
+    "details": "Обновить",
+    "detailsAria": "Обновить детали персонажа"
+  },
+  "details": {
+    "closeAria": "Закрыть детали",
+    "loading": "Загрузка деталей...",
+    "birthYear": "Год рождения",
+    "gender": "Пол",
+    "height": "Рост",
+    "mass": "Масса",
+    "hairColor": "Цвет волос",
+    "skinColor": "Цвет кожи",
+    "eyeColor": "Цвет глаз"
+  },
+  "flyout": {
+    "selected": "{count, plural, one {Выбран # элемент} few {Выбрано # элемента} many {Выбрано # элементов} other {Выбрано # элементов}}",
+    "unselectAll": "Снять выделение",
+    "download": "Скачать"
+  },
+  "results": {
+    "empty": "Ничего не найдено.",
+    "error": "Произошла неизвестная ошибка"
+  },
+  "about": {
+    "title": "О проекте",
+    "description": "Star Wars Explorer — учебное приложение для курса React в Rolling Scopes School. Демонстрирует маршрутизацию, серверный рендеринг, пагинацию и master-detail layout на Next.js App Router.",
+    "author": "Автор:",
+    "authorName": "azamxvit",
+    "source": "Источник:",
+    "sourceLabel": "Задания RS School React",
+    "courseLink": "Курс React Rolling Scopes School"
+  },
+  "notFound": {
+    "title": "404 — Страница не найдена",
+    "description": "Запрашиваемая страница не существует.",
+    "back": "На главную"
+  },
+  "error": {
+    "title": "Что-то пошло не так.",
+    "reload": "Перезагрузить страницу",
+    "throw": "Вызвать ошибку"
+  }
+}

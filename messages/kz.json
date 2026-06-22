@@ -1,0 +1,75 @@
+{
+  "app": {
+    "title": "Star Wars зерттеуші",
+    "nav": {
+      "home": "Басты бет",
+      "about": "Жоба туралы"
+    },
+    "language": {
+      "label": "Тіл:",
+      "en": "English",
+      "ru": "Русский",
+      "kz": "Қазақша"
+    }
+  },
+  "search": {
+    "placeholder": "Star Wars кейіпкерлерін іздеу...",
+    "submit": "Іздеу"
+  },
+  "pagination": {
+    "ariaLabel": "Беттеу",
+    "prev": "Артқа",
+    "next": "Алға",
+    "page": "{page}-бет"
+  },
+  "theme": {
+    "label": "Тема:",
+    "light": "жарық",
+    "dark": "қараңғы"
+  },
+  "refresh": {
+    "list": "Жаңарту",
+    "listAria": "Кейіпкерлер тізімін жаңарту",
+    "details": "Жаңарту",
+    "detailsAria": "Кейіпкер мәліметтерін жаңарту"
+  },
+  "details": {
+    "closeAria": "Мәліметтерді жабу",
+    "loading": "Мәліметтер жүктелуде...",
+    "birthYear": "Туған жылы",
+    "gender": "Жынысы",
+    "height": "Бойы",
+    "mass": "Салмағы",
+    "hairColor": "Шаш түсі",
+    "skinColor": "Тері түсі",
+    "eyeColor": "Көз түсі"
+  },
+  "flyout": {
+    "selected": "{count, plural, one {# элемент таңдалды} other {# элемент таңдалды}}",
+    "unselectAll": "Таңдауды алу",
+    "download": "Жүктеп алу"
+  },
+  "results": {
+    "empty": "Ештеңе табылмады.",
+    "error": "Белгісіз қате орын алды"
+  },
+  "about": {
+    "title": "Жоба туралы",
+    "description": "Star Wars Explorer — Rolling Scopes School React курсына арналған оқу қолданбасы. Next.js App Router арқылы маршруттау, серверлік рендеринг, беттеу және master-detail layout көрсетіледі.",
+    "author": "Автор:",
+    "authorName": "azamxvit",
+    "source": "Дереккөз:",
+    "sourceLabel": "RS School React тапсырмалары",
+    "courseLink": "Rolling Scopes School React курсы"
+  },
+  "notFound": {
+    "title": "404 — Бет табылмады",
+    "description": "Сіз іздеген бет жоқ.",
+    "back": "Басты бетке"
+  },
+  "error": {
+    "title": "Бір нәрсе дұрыс болмады.",
+    "reload": "Бетті қайта жүктеу",
+    "throw": "Қате шақыру"
+  }
+}
