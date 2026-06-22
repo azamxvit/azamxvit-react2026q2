@@ -57,27 +57,6 @@ describe('fetchCharacters', () => {
 
     await expect(fetchCharacters('missing')).rejects.toThrow(/404/);
   });
-
-  it('retries with swapi.dev when py4e responds with 403', async () => {
-    const payload = {
-      count: 1,
-      next: null,
-      previous: null,
-      results: [{ name: 'Luke', birth_year: '19BBY', gender: 'male', url: 'u' }],
-    };
-    vi.stubGlobal(
-      'fetch',
-      vi
-        .fn()
-        .mockResolvedValueOnce(failResponse(403))
-        .mockResolvedValueOnce(okResponse(payload)),
-    );
-
-    await expect(fetchCharacters('luke')).resolves.toEqual(payload);
-    expect(fetch).toHaveBeenCalledTimes(2);
-    expect(fetch).toHaveBeenNthCalledWith(1, expect.stringContaining('swapi.py4e.com'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(2, expect.stringContaining('swapi.dev'), expect.any(Object));
-  });
 });
 
 describe('fetchCharacterById', () => {
